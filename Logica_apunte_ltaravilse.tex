@@ -1,0 +1,382 @@
+\documentclass{article}
+\usepackage[spanish]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{hyperref}
+\newfont{\rsfsten}{rsfs10 scaled 1200}
+\newfont{\rsfsseven}{rsfs10 scaled 1200}
+\newfont{\rsfsfive}{rsfs10 scaled 1200}
+\usepackage[paper=a4paper, left=2.5cm, right=2.5cm, bottom=3.5cm, top=3.5cm]{geometry}
+\begin{document}
+\begin{center}
+{\bf \Huge Computabilidad}
+\end{center}
+\newpage
+\tableofcontents
+\newpage
+\section{Programas y funciones computables}
+\subsection{El lenguaje \texorpdfstring{\rsfsten{S}}{S}}
+Definimos el lenguaje {\rsfsten{S}} de la siguiente manera:
+\begin{enumerate}
+\item Las variables de entrada de {\rsfsten{S}} son $\{X_i\}_{i\in \mathbb{N}}$.
+\item La variable de retorno de {\rsfsten{S}} es $Y$.
+\item Las variables locales de {\rsfsten{S}} son $\{Z_i\}_{i\in \mathbb{N}}$.
+\item Las variables de {\rsfsten{S}} toman valores en $\mathbb{N}_0$.
+\item Las etiquetas de {\rsfsten{S}} son $A_1, B_1, C_1, D_1, E_1, A_2, B_2, C_2, D_2, E_2, A_3,\dots$
+\item Las instrucciones de {\rsfsten{S}} son:
+\begin{itemize}
+\item $V \leftarrow V+1$
+\item $V \leftarrow V-1$
+\item IF $V \neq 0$ GOTO $L$
+\end{itemize}
+donde $V$ es una variable y $L$ es una etiqueta. Las instrucciones pueden además tener una etiqueta.
+\end{enumerate}
+Veamos qué quiere decir cada una de estas afirmaciones y como funciona el lenguaje.\\
+La primer afirmación dice que hay una variable de entrada por cada número natural, y que a la $i$-ésima variable de entrada la llamamos $X_i$. Un programa de {\rsfsten{S}} que toma $n$ variables de entrada comienza con $X_m = 0$ para todo $m > n$. La variable $X_1$ es comunmente denominada $X$.\\
+La segunda afirmación dice que todo programa del lenguaje {\rsfsten{S}} va a devolver el valor que tenga la variable $Y$ al finalizar la ejecución de la última instrucción que ejecute el programa.\\
+La tercer afirmación dice que cuando un programa de {\rsfsten{S}} use variables que no son parte de la entrada (variables locales), estas serán una por cada natural y llamaremos $Z_i$ a la $i$-ésima variable local. Por definición empiezan todas con el valor 0.\\
+La cuarta afirmación nos dice que los valores que pueden tomar las variables son los naturales y el cero (es decir, enteros no negativos, o enteros mayores o iguales a cero). Al igual que lo que pasa con la variable $X_1$, podemos llamarle $Z$ a la variable $Z_1$\\
+La quinta afirmación nos dice que las etiquetas que tenemos disponibles para nuestro programa serán $A_i$, $B_i$, $C_i$, $D_i$ y $E_i$ con $i$ un número natural, que nuevamente podemos omitir si es el número 1.\\
+La sexta y última afirmación habla de las instrucciones del lenguaje {\rsfsten{S}}. Estas son:
+\begin{itemize}
+\item $V \leftarrow V+1$ que incrementa el valor de la variable $V$ en 1.
+\item $V \leftarrow V-1$ que decrementa el valor de la variable $V$ en 1 si $V$ no vale 0. Si $V = 0$ no hace nada.
+\item IF $V \neq 0$ GOTO $L$, que ejecuta la primer instrucción del programa con etiqueta $L$ si la variable $V$ tiene un valor distinto de 0. Si no existe ninguna instrucción con la etiqueta $L$ entonces el programa termina. La etiqueta $E$ se suele utilizar para terminar un programa, y por lo tanto no se suele usar.
+\end{itemize}
+También vamos a agregar la instrucción $V \leftarrow V$ que no tiene ningún efecto pero nos será útil más adelante. Las instucciones pueden además tener una etiqueta. Un ejemplo de una instrucción con una etiqueta es:\\
+$[B] X \leftarrow X+1$
+\subsection{Programas de \texorpdfstring{{\rsfsten{S}}}{S}}
+Un programa en el lenguaje {\rsfsten{S}} es una lista finita de instrucciones de {\rsfsten{S}} que se ejecutan comenzando en la primer instrucción y en un orden definido de la siguiente manera siendo $n$ la cantidad de instrucciones del programa:
+\begin{itemize}
+\item Si la $i$-ésima instrucción es $V \leftarrow V+1$, $V \leftarrow V-1$ o $V \leftarrow V$, luego de ejecutar dicha instrucción se ejecutará la $i+1$-ésima instrucción en caso de que esta exista. Si $i = n$ el programa termina luego de ejecutar la $n$-ésima instrucción.
+\item Si la $i$-ésima instrucción es IF $V \neq 0$ GOTO $L$ y la variable $V$ tiene valor 0, se procede igual que en el caso anterior.
+\item Si la $i$-ésima instrucción es IF $V \neq 0$ GOTO $L$ y la variable $V$ tiene un valor distinto de 0, y existe al menos una instrucción con etiqueta $L$, entonces se ejecutará, luego de la $i$-ésima instrucción, la primer instrucción del programa que tenga dicha etiqueta (si más de una instrucción comparten una misma etiqueta, sólo la primera será válida, y todas las demás serán ignoradas). 
+\item Si la $i$-ésima instrucción es IF $V \neq 0$ GOTO $L$ y la variable $V$ tiene un valor distinto de 0, y no existe ninguna instrucción con etiqueta $L$, entonces el programa terminará luego de ejecutar dicha instrucción.
+\end{itemize}
+Un ejemplo de un programa en {\rsfsten{S}} es
+\\[2\baselineskip]
+\begin{tabular}{ll}
+$[A]$ & $X \leftarrow X-1$\\
+& $Y \leftarrow Y+1$\\
+& IF $X \neq 0$ GOTO $A$
+\end{tabular}
+\\[2\baselineskip]
+Este programa computa la función que vale 1 si $x = 0$ o $x$ si $x\neq 0$.
+El siguiente programa computa la función identidad:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+$[A]$ & IF $X \neq 0$ GOTO B\\
+& $Z \leftarrow Z+1$\\
+& IF $Z \neq 0$ GOTO $E$\\
+$[B]$ & $X \leftarrow X-1$\\
+& $Y \leftarrow Y+1$\\
+& $Z \leftarrow Z+1$\\
+& IF $Z \neq 0$ GOTO $A$
+\end{tabular}
+\\[2\baselineskip]
+Las instrucciones $Z \leftarrow Z+1$ están para que al ejecutar la instrucción IF $Z \neq 0$ GOTO $L$ (siendo $L = E$ o $L = A$), siempre se cumpla la condición. Podemos entonces, si usamos para esto una variable local que no sea usada en el resto del programa, simular la instrucción GOTO $L$. A estas instrucciones, que no vienen provistas por el lenguaje, pero podemos simularlas con dos o más instrucciones de {\rsfsten{S}}, las denominamos macros.
+\subsection{Macros}
+Una macro es una instrucción que no viene dada por el lenguaje pero puede ser simulada por otra instrucción. Por ejemplo, la instrucción GOTO $L$ es una macro, ya que puede ser simulada por las instrucciones
+\\[2\baselineskip]
+$Z \leftarrow Z+1$\\
+IF $Z \neq 0$ GOTO $L$
+\\[2\baselineskip]
+A las instrucciones que simulan una macro las denominamos expansión de la macro.\\
+Ya vimos un programa que computa la función identidad, por lo que en principio podríamos decir que tenemos la macro $V \leftarrow V'$. Esto sin embargo no es así, ya que al guardar en $Y$ el valor que tiene $X$ con este programa, $X$ pierde su valor y pasa a valer 0. Sin embargo podemos simular esa instrucción con la siguiente macro
+\\[2\baselineskip]
+\begin{tabular}{ll}
+$[A]$ & IF $X \neq 0$ GOTO B\\
+& GOTO $C$\\
+$[B]$& $X \leftarrow X-1$\\
+& $Y \leftarrow Y+1$\\
+& $Z \leftarrow Z+1$\\
+& GOTO $A$\\
+$[C]$ & IF $Z \neq 0$ GOTO $D$\\
+& GOTO $E$\\
+$[D]$ & $Z \leftarrow Z-1$\\
+& $X \leftarrow X + 1$\\
+& GOTO $C$
+\end{tabular}
+\\[2\baselineskip]
+que copia el valor de $X$ en $Y$, pero también lo conserva en $X$. Luego podemos usar la macro $V \leftarrow V'$. No debe preocuparnos el hecho de usar variables locales o etiquetas que podamos usar luego en el programa, siempre y cuando tengamos cuidado y renombremos las variables para que no aparezcan en otra parte del programa.\\
+Ahora podemos escribir un programa que compute la suma de dos números enteros, y gracias al uso de macros este programa será bastante corto y sencillo de entender:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+& $Y \leftarrow X_1$\\
+& $Z \leftarrow X_2$\\
+$[B]$ & IF $Z \neq 0$ GOTO $A$\\
+& GOTO $E$\\
+$[A]$ & $Z \leftarrow Z-1$\\
+& $Y \leftarrow Y+1$\\
+& GOTO $B$
+\end{tabular}
+\subsection{Estados y snapshots}
+Un estado de un programa es una asignación de valores a sus variables. Un estado le asigna un valor a todas las variables que aparecen en el programa, y no le asigna más de una vez un valor a una misma variable. Si por ejemplo tenemos el programa {\rsfsten{P}} dado por
+\\[2\baselineskip]
+$X \leftarrow X-1$
+$Y \leftarrow Y+1$
+\\[2\baselineskip]
+Los siguientes son estados válidos de {\rsfsten{P}}
+$$X = 3 \quad Y = 2$$
+$$X = 2 \quad Y = 2 \quad Z_4 = 8$$
+En el segundo caso, no importa que $Z_4$ no aparezca en {\rsfsten{P}}, ya que el estado le asigna un valor a todas las variables que aparecen en {\rsfsten{P}}.\\
+Los siguientes estados no son válidos para {\rsfsten{P}}
+$$X = 3 \quad X = 2 \quad Y = 1$$
+$$X_2 = 3 \quad Y = 1$$
+El primero no lo es ya que le asigna dos veces un valor a $X$, y el segundo porque no le asigna ninguno, y $X$ es una variable del programa {\rsfsten{P}}. Para que un estado sea válido no es necesario que este sea alcanzable por el programa.
+\\[2\baselineskip]
+Definimos un snapshot de un programa como un par $(i,\sigma)$ donde $1 \leq i \leq n+1$ (siendo $n$ la longitud del programa, es decir, la cantidad de instrucciones del programa) y $\sigma$ un estado. El número $i$ representa la instrucción a ejecutarse si $i \leq n$, y cuando $i = n+1$ representa la terminación del programa. Un snapshot se dice terminal si $i = n+1$.\\
+Para cada snapshot no terminal, definimos su sucesor como el snapshot que se obtiene de la siguiente manera:
+\begin{itemize}
+\item Si la $i$-ésima instrucción es $V \leftarrow V+1$, entonces reemplazamos $i$ por $i+1$ y la ecuación $V = t$ por la ecuación $V = t+1$ en $\sigma$ donde $t$ es el valor de $V$ en el estado $\sigma$.
+\item Si la $i$-ésima instrucción es $V \leftarrow V-1$, entonces reemplazamos $i$ por $i+1$ y la ecuación $V = t$ por la ecuación $V = \max(t-1,0)$ en $\sigma$ donde $t$ es el valor de $V$ en el estado $\sigma$.
+\item Si la $i$-ésima instrucción es $V \leftarrow V$, entonces reemplazamos $i$ por $i+1$ y no modificamos $\sigma$.
+\item Si la $i$-ésima instrucción es IF $V \neq 0$ GOTO $L$, en caso de que exista una instrucción con etiqueta $L$, reemplazamos $i$ por el número de esa instrucción (la primera si hay varias), caso contrario reemplazamos $i$ por $n+1$. En ambos casos conservamos $\sigma$ sin modificarlo.
+\end{itemize}
+Un cálculo de un programa {\rsfsten{P}} es una lista de snapshots $s_1, s_2, \dots, s_k$ tal que para todo $1 \leq i < k$ se tiene que $s_{i+1}$ es el sucesor de $s_i$, y $s_k$ es terminal.
+\subsection{Funciones computables}
+Un estado se dice inicial si la variable $Y$ y todas las variables $Z_i$ valen 0. Un snapshot $s = (i,\sigma)$ se dice inicial si $i = 1$ y $\sigma$ es un estado inicial.\\
+Si existe un cálculo de {\rsfsten{P}} que comienza con un snapshot inicial $s = (i,\sigma)$ donde $X_1 = r_1,\,\dots, \,X_n = r_n$ y todas las demás variables están en cero en $\sigma$, entonces decimos que $y = \psi_P^{(n)}(r_1,\dots,r_n)$ si $y$ es el valor que toma $Y$ en el estado terminal de dicho cálculo. Caso contrario decimos que $\psi_P^{(n)}(r_1,\dots,r_n)$ está indefinido.\\
+Dada una función $g$, decimos que {\rsfsten{P}} computa $g$ si
+$$g(r_1,\dots,r_n) = \psi_P^{(n)}(r_1,\dots,r_n)$$
+cuando ambos lados de la ecuación están definidos, y cuando una se indefine la otra también.\\
+En este caso decimos que $g$ es parcialmente computable (o parcialmente recursiva), y es total si nunca se indefine. Una función se dice computable (o recursiva) si es parcialmente computable y total.
+\subsection{Predicados}
+Decimos que $P(V_1,\dots,V_n)$ es un predicado si toma dos valores de verdad (TRUE y FALSE) a los que representaremos por 1 y 0 respectivamente. Si un predicado es computable, entonces
+\\[2\baselineskip]
+$Z \leftarrow P(V_1,\dots,V_n)$\\
+IF $Z \neq 0$ GOTO $L$
+\\[2\baselineskip]
+es la expansión de la macro IF $P(V_1,\dots,V_n)$ GOTO $L$. En este caso, $Z \leftarrow P(V_1,\dots,V_n)$ es también una macro que resulta de reemplazar $Y$ por $Z$ y $X_i$ por $V_i$ para todo $1 \leq i \leq n$ en el programa que computa $P(V_1,\dots,V_n)$.
+\section{Funciones primitivas recursivas}
+\subsection{Composición}
+Si tenemos $f,g: \mathbb{N}_0 \rightarrow \mathbb{N}_0$, decimos que 
+$$h(x) = f(g(x))$$
+es la composición de $f$ con $g$.\\
+Si tenemos $f; \mathbb{N}_0^k \rightarrow \mathbb{N}_0$ y $g_1, \dots, g_k: \mathbb{N}_0^n \rightarrow \mathbb{N}_0^k$ decimos que $h$ se obtiene de $f, g_1, \dots, g_k$ por composición si
+$$h(x_1,\dots,x_n) = f(g_1(x_1,\dots,x_n),\dots,g_k(x_1,\dots,x_n))$$
+$h$ está definida por $f(z_1,\dots,z_k)$ donde $z_i = g_i(x_1,\dots,x_n)$ para todo $1 \leq i \leq k$ si $z_1, \dots, z_k$ están definidas y $f(z_1,\dots,z_k)$ también.\\
+Si $f,g_1,\dots,g_k$ son (parcialmente) computables, $h$ también lo es y se computa con el siguiente programa:
+\\[2\baselineskip]
+$Z_1 \leftarrow g_1(X_1,\dots,X_n)$\\
+$\dots$\\
+$Z_k \leftarrow g_k(X_1,\dots,X_n)$\\
+$Y \leftarrow f(Z_1,\dots,Z_k)$
+\subsection{Recursión}
+Si $k$ es constante y
+$$h(0) = k$$
+$$h(t+1) = g(t,h(t))$$
+para alguna función total $g$ de dos variables, decimos que $h$ se obtiene de $g$ por recursión.\\
+Si $g$ es computable, $h$ es computable por el siguiente programa:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+& $Y \leftarrow k$\\
+$[A]$ & IF $X = 0$ GOTO $E$\\
+& $Y \leftarrow g(Z,Y)$\\
+& $X \leftarrow X-1$\\
+& GOTO $A$
+\end{tabular}
+\\[2\baselineskip]
+Donde $Y \leftarrow k$ es la macro que consiste en $k$ instrucciones $Y \leftarrow Y+1$ cuadno $Y$ vale 0. Si $Y$ no vale 0 también podemos resetearla a 0 con una macro, y IF $X = 0$ GOTO $E$ se corresponde con la siguiente macro:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+& IF $X \neq 0$ GOTO $A$\\
+& GOTO $E$\\
+$[A]$& \textrm{siguiente instrucción}
+\end{tabular}
+\\[2\baselineskip]
+También podemos definir recursión para funciones de varias variables de la siguiente manera:
+$$h(x_1,\dots,x_n,0) = f(x_1,\dots,x_n)$$
+$$h(x_1,\dots,x_n,t+1) = g(t,h(x_1,\dots,x_n,t),x_1,\dots,x_n)$$
+Y también podemos ver que si $f$ y $g$ son computables, $h$ es computable por el siguiente programa:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+& $Y \leftarrow f(X_1,\dots,X_n)$\\
+$[A]$ & IF $X_{n+1} = 0$ GOTO $E$\\
+& $Y \leftarrow g(Z,Y,X_1,\dots,X_n)$\\
+& $Z \leftarrow Z+1$\\
+& $X_{n+1} \leftarrow X_{n+1}-1$\\
+& GOTO $A$
+\end{tabular}
+
+\subsection{Clases PRC}
+Una clase PRC (primitive recursively closed) o clase cerrada por primitivas recursivas, es una clase cerrada por recursión, composición y que contiene a las funciones iniciales, que son:
+$$s(x) = x+1$$
+$$n(x) = 0$$
+$$u_i^n(x_1,\dots,x_n) = x_i \quad 1 \leq i \leq n$$
+La clase de funciones computables es una clase PRC. Ya vimos que las funciones iniciales son computables y que composición y recursión de computables es computable, luego las computables son una clase PRC.\\
+Una función es primitiva recursiva si puede obtenerse de las funciones iniciales mediante una cadena finita de composiciones y recursiones. Es fácil ver que toda clase PRC contiene a las funciones primitivas recursivas. A su vez, toda función que pertenece a todas las clases PRC, es primitiva recursiva, luego las primitivas recursivas constituyen una clase PRC.\\
+De lo dicho anteriormente podemos deducir fácilmente que toda función primitiva recursiva es computable.
+\subsection{Predicados primitivos recursivos}
+Un predicado es una función $P: \mathbb{N}^n \rightarrow \{0,1\}$ con $n\in \mathbb{N}$. La definición de predicado primitivo recursi\-vo es análoga a la de función primitiva recursiva. Si $P$ y $Q$ son predicados primitivos recursivos, entonces $¬P$ ($1-P$), $P \wedge Q$ ($P \cdot Q$), $P\vee Q$ ($1-(1-P)\cdot (1-Q)$)) y $P \rightarrow Q$ ($1-P\cdot(1-Q)$)) lo son.\\
+El predicado
+$$f(x_1,\dots,x_n) =
+\left\{
+	\begin{array}{ll}
+		g(x_1,\dots,x_n)  & \mbox{si } P(x_1,\dots,x_n)\\
+		h(x_1,\dots,x_n)  & \mbox{caso contrario})
+	\end{array}
+\right.$$
+es computable si $P$ es computable.
+\subsection{Cuantificadores acotados}
+Sea $C$ una clase PRC. Si $f(t,x_1,\dots,x_n)$ pertenecen a $C$, entonces también pertenecen a $C$ las funciones:
+$$g(y,x_1,\dots,x_n) = \displaystyle \sum_{t=0}^{y} f(t,x_1,\dots,x_n)$$
+y
+$$h(y,x_1,\dots,x_n) = \displaystyle \prod_{t=0}^{y} f(t,x_1,\dots,x_n)$$
+Si $P$ es un predicado se tiene:
+$$(\forall t)_{\leq y} P(t,x_1,\dots,x_n) \Leftrightarrow \displaystyle \left[\prod_{t=0}^{y} f(t,x_1,\dots,x_n)\right] = 1$$
+$$(\exists t)_{\leq y} P(t,x_1,\dots,x_n) \Leftrightarrow \displaystyle \left[\sum_{t=0}^{y} f(t,x_1,\dots,x_n)\right] \neq 0$$
+Luego si $P$ es computable (o primitivo recursivo), tanto $(\forall t)_{\leq y} P(t,x_1,\dots,x_n)$ como $(\exists t)_{\leq y} P(t,x_1,\dots,x_n)$ lo son.
+\subsection{Minimalización}
+Si $P(t,x_1,\dots,x_n)$ pertenece a una clase PRC $C$, entonces también pertenece a $C$ la función
+$$g(y,x_1,\dots,x_n) = \displaystyle \sum_{u=0}^y \prod_{t=0}^u \alpha(P(t,x_1,\dots,x_n))$$
+La productoria da 1 sii para todo $0 \leq t \leq u$ el predicado $P(t,x_1,\dots,x_n)$ es falso, luego, si existe un $1 \leq u \leq y$ tal que $P(u,x_1,\dots,x_n)$ es verdadero, entonces $g(y,x_1,\dots,x_n)$ es el mínimo $u$ que cumple dicha condición. Estamos en condiciones de definir entonces la siguiente función que también pertenece a $C$
+$$\min_{t\leq y} P(t,x_1,\dots,x_n) =
+\left\{
+	\begin{array}{ll}
+		g(x_1,\dots,x_n)  & \mbox{si } (\exists t)_{\leq y} P(t,x_1,\dots,x_n)\\
+		0  & \mbox{caso contrario}
+	\end{array}
+\right.$$
+que nos devuelve el menor entero $t$ tal que $P(t,x_1,\dots,x_n)$ es verdadero, si dicho $t$ es menor o igual a $y$, y 0 si no existe ese valor o es mayor estricto a $y$.
+\\[2\baselineskip]
+Si $P(x_1,\dots,x_n,y)$ es computable entonces también lo es
+$$g(x_1,\dots,x_n) = \min_y P(x_1,\dots,x_n,y)$$
+y el programa que lo computa es
+\\[2\baselineskip]
+\begin{tabular}{ll}
+$[A]$ & IF $P(X_1,\dots,X_n,Y)$ GOTO $E$\\
+& $Y \leftarrow Y+1$\\
+& GOTO $A$
+\end{tabular}
+\subsection{Codificación de pares y números de Gödel}
+Dados dos enteros $x,y$ existe un único entero $\langle x,y \rangle$ tal que
+$$\langle x,y \rangle = 2^x (2y+1) - 1$$
+Además, esta función es biyectiva y computable. Dado un número $z = \langle x,y\rangle$ decimos que $l(z) = x$ y $r(z) = y$, que son ambas funciones computables:
+$$l(z) = \min_{x \leq z} [(\exists y)_{\leq z} (z = \langle x,y\rangle)]$$
+$$r(z) = \min_{y \leq z} [(\exists x)_{\leq z} (z = \langle x,y\rangle)]$$
+ya que claramente $x,y \leq z$.
+\\[2\baselineskip]
+Dada una $n$-upla de números enteros $(a_1, \dots, a_n)$ le llamamos número de Gödel al número
+$$[a_1,\dots,a_n] = \displaystyle \prod_{i=1}^n p_i^{a_i}$$
+Por ejemplo $[2,0,3] = 2^2 * 3^0 * 5^3 = 500$.
+\section{Programas Universales}
+\subsection{Codificación de programas}
+Usando la codificación de pares, y los números de Gödel, queremos asignarle un número a cada programa. El primer paso será asignarle un número a cada instrucción, y luego, usando los números de las instrucciones del programa, le asignaremos un número de programa.
+\\[2\baselineskip]
+Antes de darle un número a cada instrucción, ordenaremos las variables y las etiquetas. El orden de las variables será
+$$Y,X_1,Z_1,X_2,Z_2,X_3,Z_3,\dots$$
+mientras que le orden de las etiquetas será
+$$A_1,B_1,C_1,D_1,E_1,A_2,B_2,C_2,D_2,E_2,A_3,\dots$$
+empezando desde 1, es decir la variable $Y$ es la variable 1, la variable $X_i$ es la variable $2i$ y la variable $Z_i$ es la variable $2i+1$, mientras que para las etiquetas, la etiqueta $A_i$ es la etiqueta $5i-4$, la etiqueta $B_i$ es la $5i-3$, la etiqueta $C_i$ tiene número $5i-2$, la etiqueta $D_i$ será la $5_i-1$, y por último la etiqueta $E_i$ será la etiqueta que lleve el número $5i$.
+Dada una instrucción $I$ la codificaremos con el siguiente número
+$$\#(I) = \langle a,\langle b,c\rangle\rangle$$
+Donde $a$ es 0 si la instrucción no tiene etiqueta, o si tiene etiqueta, el número de la etiqueta que tenga, $c$ es el número de la variable mencionada en la instrucción menos uno (es decir, si la instrucción menciona la variable $Y$, entonces $c = 0$), y $b$ indica qué tipo de instrucción es según las siguientes reglas:
+\begin{itemize}
+\item Si la instrucción es del tipo $V \leftarrow V$ entonces $b = 0$
+\item Si la instrucción es del tipo $V \leftarrow V+1$ entonces $b = 1$
+\item Si la instrucción es del tipo $V \leftarrow V-1$ entonces $b = 2$
+\item Si la instrucción es del tipo IF $V \neq 0$ GOTO $L$ entonces $b = \#(L)+2$
+\end{itemize}
+Ahora que definimos una biyección entre $\mathbb{N}_0$ y las instrucciones de {\rsfsten{S}}, podemos codificar un programa {\rsfsten{P}} que tiene $n$ instrucciones de la siguiente manera:
+$$\#(P) = [\#(I_1),\dots,\#(I_n)]-1$$
+donde $I_i$ es la $i$-ésima instrucción de {\rsfsten{P}}.
+Notemos que la instrucción $Y \leftarrow Y$ tiene número 0 y por lo tanto prohibimos esta instrucción como última instrucción de un programa para evitar ambiguedades.
+\subsection{El Halting Problem}
+Definimos HALT($x,y$) como verdadero si $\psi_{P}^{(1)}(x)$ está definida, y falso si no lo está. HALT($x,y$) nos dice si el programa de número $y$ termina con valor de entrada $x$. Para esto consideramos que $y$ toma un sólo valor de entrada, y todos los demás son cero.
+\\[2\baselineskip]
+HALT($x,y$) no es un predicado computable. Supongamos que HALT($x,y)$ fuese computable y veamos el siguiente programa {\rsfsten{P}}:
+$$[A] \quad \mbox{IF HALT(}X,X\mbox{) GOTO }  A$$
+Si $\#(P) = y_0$ entonces si HALT($y_0,y_0$) termina, luego HALT($y_0,y_0$) no termina, pero si HALT($y_0,y_0$) no termina, luego HALT($y_0,y_0$) termina. Esta contradicción proviene de suponer que HALT($x,y$) es una función computable.
+\subsection{Teorema de Universalidad}
+Sea {\rsfsten{P}} un programa y sea $\#(P) = y$. Podemos definir la función
+$$\Phi^{(n)}(x_1,\dots,x_n,y) = \psi_{\rsfsten{P}}^{(n)}(x_1,\dots,x_n)$$
+Veamos que $\Phi^{(n)}$ es una función parcialmente computable.
+\\
+Si llamamos $p_i$ al $i$-ésimo primo, sabemos que $p_1 = 2$, y veamos como podemos obtener el $i$-ésimo primo:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+& $Y \leftarrow Y+1$\\
+& $Y \leftarrow Y+1$\\
+& $Z \leftarrow Z+1$\\
+$[A]$ & $X \leftarrow X-1$\\
+& IF $X_1 = 0$ GOTO $E$\\
+& $Z \leftarrow Y \cdot Z$\\
+& $Y \leftarrow \displaystyle \min_{y\leq z} [(\forall x)_\leq{y} \textrm{ coprimo}(y,x) \vee x=y]$\\
+& GOTO $A$
+\end{tabular}
+\\[2\baselineskip]
+Este programa obtiene en cada paso al $i$-ésimo primo en $Y$, y el producto de los primeros $i$ primos en $Z$, ya que si al producto de los primeros $i$ primos, le restamos 1, entonces obtenemos un número que no es divisible por ninguno de esos primos, y luego hay un primo más que es menor que ese producto.\\
+Nos falta probar que comprimo es una función computable, pero es fácil probar que el algoritmo de Euclides es computable.\\
+Veamos ahora que $\Phi^{(n)}$ es computable por el siguiente programa (donde $Lt(Z)$ es la cantidad de instrucciones del programa $P$, que se computa dividiendo el número del programa por los primos en orden creciente, hasta que llegamos a 1:
+\\[2\baselineskip]
+\begin{tabular}{ll}
+& $Z \leftarrow X_{n+1} + 1$\\
+& $S \leftarrow \displaystyle \prod_{i=1}^{n} (p_{2i})^{X_i}$\\
+& $K \leftarrow 1$\\
+$[C]$ & IF $K = Lt(Z)+1 \vee K = 0$ GOTO $F$\\
+& $U \leftarrow r((Z)_K)$\\
+& $P \leftarrow P_{r(U)+1}$\\
+& IF $l(U) = 0$ GOTO $N$\\
+& IF $l(U) = 1$ GOTO $A$\\
+& IF coprimo($P,S$) GOTO $N$\\
+& IF $l(U) = 2$ GOTO $M$\\
+& $K \leftarrow \displaystyle \min_{i \leq Lt(Z)} [l((Z)_i) + 2 = l(U)]$\\
+& GOTO $C$\\
+$[M]$ & $S \leftarrow S/P$\\
+& GOTO $N$\\
+$[A]$ & $S \leftarrow S\cdot P$\\
+$[N]$ & $K \leftarrow K+1$ \\
+& GOTO $C$\\
+$[F]$ & $Y \leftarrow (S)_1$
+\end{tabular}
+Este programa se llama programa universal. El Step-Counter Theorem dice que $STP^{(n)}(x_1,\dots,x_n,y,t)$ dice si $\Phi(x_1,\dots,x_n,y)$ termina en a lo sumo $t$ pasos y el algoritmo es el mismo agregandole un contador, que al llegar a $t$ devuelve 0, y si el programa de número $y$ termina, devuelve 1. Esta función es totalmente computable.
+\subsection{Conjuntos recursivamente enumerables}
+Un conjunto computable es el conjunto de valores de entrada para los cuales un predicado computable unario $P$ es verdadero, y análogamente definimos conjunto primitivo recursivo en función de predicados primitivos recursivos unarios.
+\\[2\baselineskip]
+Un conjunto $B$ es recusrivamente enumerable si existe una función parcialmente computable $g$ que está definida en $x$ sii $x \in B$. Un conjunto es computable sí y sólo sí $B$ y su complemento son recursivamente enumerable (el algoritmo es tener una variable $T$ que va creciendo e ir computando los $STP$ de $T$ pasos con las funciones que están definidas en cada uno de los dos conjuntos.
+\\[2\baselineskip]
+Definimos el conjunto $K$ como el conjunto de los $n$ tales que $HALT(n,n)$ es 1. $K$ es recursivamente enumerable ya que $HALT$ es parcialmente computable por $\Phi^{(1)}(n,n)$ (existe un programa con un sólo parámetro que consiste en copiar al principio en $X_2$ el valor de $X_1$, pero $K$ no es computable. La demostración utiliza los conjuntos $W_i$ que están definidos como los valores de entrada que hacen que el $i$-ésimo programa esté definido, y que son todos los conjuntos recursivamente enumerables, junto con el hecho de que si $K$ y su complemento son recursivamente enumerables entonces $K$ es computable.
+\subsection{Teorema del Parámetro}
+Para cada par de enteros positivos $n,m$ existe una función $S_m^n(u_1,\dots,u_n,y)$ tal que
+$$\Phi^{(m+n)}(x_1,\dots,x_m,u_1,\dots,u_n,y) = \Phi^{(m)}(x_1,\dots,x_m,S_m^n(u_1,\dots,u_n,y))$$
+Para demostrar esto lo hacemos por inducción ya que
+$$S_m^{k+1}(u_1,\dots,u_k,u_{k+1},y) = S_m^k(u_1,\dots,u_k,S_{m+k}^1(u_{k+1},y))$$
+ya que $S_a^b$ es el programa que setea las variables $a+1,\dots,a+b$ con sus parámetros y luego corre el programa $y$, así, alcanza con demostrar que $S_m^1$ es primitiva recursiva para todo $m$, luego $S_m^k$ es primitiva recursiva para todo par $m,k$.
+Para probar esto, agregamos $u$ instrucciones $X_{m+1} \leftarrow X_{m+1} + 1$ y podemos calcular fácilmente el programa de la siguiente manera:
+$$S_m^1(u,y) = \left[ \left(\displaystyle \prod_{i=1}^{u} p_i \right)^{16m+10} \cdot \prod_{j=1}^{Lt(y+1)} p_{u+j}^{(y+1)_j}\right] - 1$$
+Notemos que $16m + 10 = \langle 0, \langle 1, 2m+1 \rangle \rangle$.
+\subsection{El teorema de la recursión}
+Definimos
+$$\Phi_e^{(m)}(x_1,\dots,x_m) = \Phi^{(m)}(x_1,\dots,x_n,e)$$
+Si $g(z,x_1,\dots,x_n)$ es una función parcialmente computable, entonces existe un $e$ tal que
+$$\Phi_e^{(m)}(x_1,\dots,x_m) = g(e,x_1,\dots,x_m)$$
+para todo $(x_1,\dots,x_m) \in \mathbb{N}_0^m$. Para probar esto usamos el teorema del parámetro, y como $S_m^1$ es parcialmente computable entonces existe $z_0$ tal que
+$$g(S_m^1(v,v),x_1,\dots,x_m) = \Phi^{(m+1)}(x_1,\dots,x_m,v,z_0) = \Phi^{(m)}(x_1,\dots,x_m,S_m^1(v,z_0))$$
+Si tomamos $v = z_0$ y $e = S_m^1(z_0,z_0)$ entonces
+$$g(e,x_1,\dots,x_m) = \Phi^{(m)}(x_1,\dots,x_m,e) = \Phi_e^{(m)}(x_1,\dots,x_m)$$
+El teorema del punto fijo dice que si $f(z)$ es computable entonces hay un $e$ tal que
+$$\Phi_{f(e)}(x) = \Phi_e(x)$$
+y se obtiene tomando $g(z,x) = \Phi_{f(z)}(x)$
+\subsection{Teorema de Rice}
+Sea $\Gamma$ una colección de funciones parcialmente computables de una variable. Sean $f,g$ funciones parcialmente computables de una variable tales que $f\in \Gamma, g \notin \Gamma$, el teorema de Rice dice que $R_\Gamma$, el conjunto de valores de $t$ tales que $\Phi_t \in \Gamma$ no es computable.\\
+Sea $P_\Gamma (t)$ la función característica de $R_\Gamma$ y
+$$h(t,x) =
+\left\{
+	\begin{array}{ll}
+		g(x)  & \mbox{si } P_\Gamma (t) = 1\\
+		f(x)  & \mbox{si } P_\Gamma (t) = 0
+	\end{array}
+\right.$$
+Como $h$ es parcialmente computable entonces existe un $e$ tal que
+$$\Phi_e(x) = h(e,x) =
+\left\{
+	\begin{array}{ll}
+		g(x)  & \mbox{si } \Phi_e \mbox{ pertenece a } \Gamma\\
+		f(x)  & \mbox{caso contrario}
+	\end{array}
+\right.$$
+Pero entonces podemos demostrar que $e\in \Gamma$ y también $e \notin \Gamma$
+\end{document}
